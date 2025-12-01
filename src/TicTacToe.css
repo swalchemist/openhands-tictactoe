@@ -16,6 +16,43 @@
   text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
 }
 
+.game-controls {
+  margin-bottom: 20px;
+}
+
+.ai-toggle {
+  padding: 8px 16px;
+  font-size: 14px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-weight: bold;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.ai-toggle.enabled {
+  background-color: #28a745;
+  color: white;
+}
+
+.ai-toggle.enabled:hover {
+  background-color: #218838;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+}
+
+.ai-toggle.disabled {
+  background-color: #6c757d;
+  color: white;
+}
+
+.ai-toggle.disabled:hover {
+  background-color: #5a6268;
+  transform: translateY(-1px);
+  box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+}
+
 .game-status {
   font-size: 1.5rem;
   font-weight: bold;
