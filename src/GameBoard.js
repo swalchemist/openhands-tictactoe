@@ -28,6 +28,11 @@ class GameBoard {
     this.board[row][col] = value;
   }
 
+  getBoard() {
+    // Return a copy of the board to prevent external modification
+    return this.board.map(row => [...row]);
+  }
+
   _validatePosition(row, col) {
     if (row < 0 || row >= GameBoard.BOARD_SIZE || col < 0 || col >= GameBoard.BOARD_SIZE) {
       throw new Error(`Invalid position: (${row}, ${col}). Must be between 0 and ${GameBoard.BOARD_SIZE - 1}.`);

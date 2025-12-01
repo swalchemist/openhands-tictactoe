@@ -1,12 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import GameBoard from './GameBoard';
 import AIPlayer from './AIPlayer';
+import LLMAIPlayer from './LLMAIPlayer';
 import './TicTacToe.css';
 
 const TicTacToe = () => {
   const [gameBoard, setGameBoard] = useState(() => new GameBoard());
   const [aiPlayer] = useState(() => new AIPlayer('O'));
+  const [llmAIPlayer] = useState(() => new LLMAIPlayer());
   const [isAIEnabled, setIsAIEnabled] = useState(true);
+  const [useLLM, setUseLLM] = useState(false);
+  const [apiKey, setApiKey] = useState('');
+  const [difficulty, setDifficulty] = useState('normal');
   const [isAIThinking, setIsAIThinking] = useState(false);
   const [, forceUpdate] = useState({});
 
@@ -16,16 +21,27 @@ const TicTacToe = () => {
   };
 
   // AI move logic with delay
-  const makeAIMove = () => {
+  const makeAIMove = async () => {
     if (!isAIEnabled || gameBoard.getGameStatus() !== 'playing' || gameBoard.getCurrentPlayer() !== 'O') {
       return;
     }
 
     setIsAIThinking(true);
     
-    // Add a delay to make AI moves feel more natural
-    setTimeout(() => {
-      const move = aiPlayer.getBestMove(gameBoard);
+    try {
+      let move;
+      
+      if (useLLM && apiKey) {
+        // Use LLM AI player
+        llmAIPlayer.setApiKey(apiKey);
+        llmAIPlayer.setDifficulty(difficulty);
+        move = await llmAIPlayer.getMove(gameBoard.getBoard());
+      } else {
+        // Use traditional minimax AI player
+        await new Promise(resolve => setTimeout(resolve, 500)); // Add delay for consistency
+        move = aiPlayer.getBestMove(gameBoard);
+      }
+      
       if (move) {
         try {
           gameBoard.makeMove(move.row, move.col);
@@ -34,8 +50,11 @@ const TicTacToe = () => {
           console.log('AI move error:', error.message);
         }
       }
+    } catch (error) {
+      console.log('AI move failed:', error.message);
+    } finally {
       setIsAIThinking(false);
-    }, 500); // 500ms delay
+    }
   };
 
   // Handle human player moves
@@ -110,13 +129,13 @@ const TicTacToe = () => {
     const winner = gameBoard.getWinner();
 
     if (isAIThinking) {
-      return '🤖 AI is thinking...';
+      return useLLM && apiKey ? '🧠 LLM AI is thinking...' : '🤖 AI is thinking...';
     }
 
     switch (status) {
       case 'playing':
         if (isAIEnabled && currentPlayer === 'O') {
-          return 'AI\'s turn (O)';
+          return useLLM && apiKey ? 'LLM AI\'s turn (O)' : 'AI\'s turn (O)';
         } else if (isAIEnabled && currentPlayer === 'X') {
           return 'Your turn (X)';
         } else {
@@ -124,7 +143,8 @@ const TicTacToe = () => {
         }
       case 'won':
         if (isAIEnabled) {
-          return winner === 'X' ? '🎉 You win!' : '🤖 AI wins!';
+          const aiType = useLLM && apiKey ? '🧠 LLM AI' : '🤖 AI';
+          return winner === 'X' ? '🎉 You win!' : `${aiType} wins!`;
         } else {
           return `🎉 Winner: ${winner}!`;
         }
@@ -145,6 +165,49 @@ const TicTacToe = () => {
         >
           {isAIEnabled ? '🤖 AI: ON' : '👥 AI: OFF'}
         </button>
+        
+        {isAIEnabled && (
+          <div className="ai-settings">
+            <div className="ai-type-toggle">
+              <label>
+                <input
+                  type="checkbox"
+                  checked={useLLM}
+                  onChange={(e) => setUseLLM(e.target.checked)}
+                />
+                🧠 Use LLM AI (more creative)
+              </label>
+            </div>
+            
+            {useLLM && (
+              <div className="llm-settings">
+                <div className="api-key-input">
+                  <input
+                    type="password"
+                    placeholder="Enter OpenAI API Key"
+                    value={apiKey}
+                    onChange={(e) => setApiKey(e.target.value)}
+                    className="api-key-field"
+                  />
+                </div>
+                
+                <div className="difficulty-selector">
+                  <label>Difficulty: </label>
+                  <select 
+                    value={difficulty} 
+                    onChange={(e) => setDifficulty(e.target.value)}
+                    className="difficulty-select"
+                  >
+                    <option value="easy">Easy</option>
+                    <option value="normal">Normal</option>
+                    <option value="hard">Hard</option>
+                    <option value="creative">Creative</option>
+                  </select>
+                </div>
+              </div>
+            )}
+          </div>
+        )}
       </div>
       <div className="game-status">
         {getStatusMessage()}

@@ -25,6 +25,27 @@ describe('GameBoard', () => {
     expect(gameBoard.getCell(0, 2)).toBe('O');
   });
 
+  test('should return a copy of the board state', () => {
+    // Arrange
+    const gameBoard = new GameBoard();
+    gameBoard.setCell(0, 0, 'X');
+    gameBoard.setCell(1, 1, 'O');
+    
+    // Act
+    const board = gameBoard.getBoard();
+    
+    // Assert
+    expect(board).toEqual([
+      ['X', '', ''],
+      ['', 'O', ''],
+      ['', '', '']
+    ]);
+    
+    // Verify it's a copy (modifying returned board shouldn't affect original)
+    board[0][0] = 'MODIFIED';
+    expect(gameBoard.getCell(0, 0)).toBe('X');
+  });
+
   test('should detect when X wins horizontally', () => {
     // Arrange
     const gameBoard = new GameBoard();
