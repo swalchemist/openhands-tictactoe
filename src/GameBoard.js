@@ -1,11 +1,21 @@
 class GameBoard {
   static BOARD_SIZE = 3;
   static EMPTY_CELL = '';
+  static PLAYER_X = 'X';
+  static PLAYER_O = 'O';
+  static STATUS_PLAYING = 'playing';
+  static STATUS_WON = 'won';
+  static STATUS_DRAW = 'draw';
 
   constructor() {
     // Initialize a 3x3 grid with empty strings
     this.board = Array(GameBoard.BOARD_SIZE).fill(null)
       .map(() => Array(GameBoard.BOARD_SIZE).fill(GameBoard.EMPTY_CELL));
+    
+    // Game state
+    this.currentPlayer = GameBoard.PLAYER_X;
+    this.gameStatus = GameBoard.STATUS_PLAYING;
+    this.winner = null;
   }
 
   getCell(row, col) {
@@ -78,6 +88,90 @@ class GameBoard {
       return cell1;
     }
     return null;
+  }
+
+  getCurrentPlayer() {
+    return this.currentPlayer;
+  }
+
+  getGameStatus() {
+    return this.gameStatus;
+  }
+
+  getWinner() {
+    return this.winner;
+  }
+
+  makeMove(row, col) {
+    // Validate game state
+    if (this.gameStatus !== GameBoard.STATUS_PLAYING) {
+      const message = this.winner 
+        ? `Game is over. Winner: ${this.winner}`
+        : 'Game is over. It\'s a draw.';
+      throw new Error(message);
+    }
+
+    // Validate position
+    this._validatePosition(row, col);
+
+    // Check if cell is occupied
+    if (this.board[row][col] !== GameBoard.EMPTY_CELL) {
+      throw new Error(`Cell (${row}, ${col}) is already occupied.`);
+    }
+
+    // Make the move
+    this.board[row][col] = this.currentPlayer;
+
+    // Update game state
+    this._updateGameState();
+
+    // Switch player if game is still playing
+    if (this.gameStatus === GameBoard.STATUS_PLAYING) {
+      this.currentPlayer = this.currentPlayer === GameBoard.PLAYER_X 
+        ? GameBoard.PLAYER_O 
+        : GameBoard.PLAYER_X;
+    }
+  }
+
+  _updateGameState() {
+    // Check for winner
+    const winner = this.checkWinner();
+    if (winner) {
+      this.gameStatus = GameBoard.STATUS_WON;
+      this.winner = winner;
+      return;
+    }
+
+    // Check for draw (board full)
+    if (this._isBoardFull()) {
+      this.gameStatus = GameBoard.STATUS_DRAW;
+      return;
+    }
+
+    // Game continues
+    this.gameStatus = GameBoard.STATUS_PLAYING;
+  }
+
+  _isBoardFull() {
+    for (let row = 0; row < GameBoard.BOARD_SIZE; row++) {
+      for (let col = 0; col < GameBoard.BOARD_SIZE; col++) {
+        if (this.board[row][col] === GameBoard.EMPTY_CELL) {
+          return false;
+        }
+      }
+    }
+    return true;
+  }
+
+  reset() {
+    // Reset board
+    this.board = Array(GameBoard.BOARD_SIZE).fill(null)
+      .map(() => Array(GameBoard.BOARD_SIZE).fill(GameBoard.EMPTY_CELL));
+    
+    // Reset game state
+    this.currentPlayer = GameBoard.PLAYER_X;
+    this.gameStatus = GameBoard.STATUS_PLAYING;
+    this.winner = null;
   }
 }
 
