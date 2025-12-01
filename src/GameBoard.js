@@ -11,6 +11,10 @@ class GameBoard {
   getCell(row, col) {
     return this.board[row][col];
   }
+
+  setCell(row, col, value) {
+    this.board[row][col] = value;
+  }
 }
 
 export default GameBoard;
