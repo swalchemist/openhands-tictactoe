@@ -76,4 +76,17 @@ describe('GameBoard', () => {
     // Assert
     expect(gameBoard.checkWinner()).toBe(null);
   });
+
+  test('should throw error for invalid positions', () => {
+    // Arrange
+    const gameBoard = new GameBoard();
+    
+    // Assert - Test various invalid positions
+    expect(() => gameBoard.getCell(-1, 0)).toThrow('Invalid position: (-1, 0). Must be between 0 and 2.');
+    expect(() => gameBoard.getCell(0, -1)).toThrow('Invalid position: (0, -1). Must be between 0 and 2.');
+    expect(() => gameBoard.getCell(3, 0)).toThrow('Invalid position: (3, 0). Must be between 0 and 2.');
+    expect(() => gameBoard.getCell(0, 3)).toThrow('Invalid position: (0, 3). Must be between 0 and 2.');
+    expect(() => gameBoard.setCell(-1, 0, 'X')).toThrow('Invalid position: (-1, 0). Must be between 0 and 2.');
+    expect(() => gameBoard.setCell(0, 3, 'O')).toThrow('Invalid position: (0, 3). Must be between 0 and 2.');
+  });
 });
