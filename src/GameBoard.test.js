@@ -24,4 +24,56 @@ describe('GameBoard', () => {
     expect(gameBoard.getCell(1, 1)).toBe('X');
     expect(gameBoard.getCell(0, 2)).toBe('O');
   });
+
+  test('should detect when X wins horizontally', () => {
+    // Arrange
+    const gameBoard = new GameBoard();
+    
+    // Act - X wins in top row
+    gameBoard.setCell(0, 0, 'X');
+    gameBoard.setCell(0, 1, 'X');
+    gameBoard.setCell(0, 2, 'X');
+    
+    // Assert
+    expect(gameBoard.checkWinner()).toBe('X');
+  });
+
+  test('should detect when O wins vertically', () => {
+    // Arrange
+    const gameBoard = new GameBoard();
+    
+    // Act - O wins in first column
+    gameBoard.setCell(0, 0, 'O');
+    gameBoard.setCell(1, 0, 'O');
+    gameBoard.setCell(2, 0, 'O');
+    
+    // Assert
+    expect(gameBoard.checkWinner()).toBe('O');
+  });
+
+  test('should detect when X wins diagonally', () => {
+    // Arrange
+    const gameBoard = new GameBoard();
+    
+    // Act - X wins on main diagonal
+    gameBoard.setCell(0, 0, 'X');
+    gameBoard.setCell(1, 1, 'X');
+    gameBoard.setCell(2, 2, 'X');
+    
+    // Assert
+    expect(gameBoard.checkWinner()).toBe('X');
+  });
+
+  test('should return null when no winner exists', () => {
+    // Arrange
+    const gameBoard = new GameBoard();
+    
+    // Act - Set some moves but no winner
+    gameBoard.setCell(0, 0, 'X');
+    gameBoard.setCell(0, 1, 'O');
+    gameBoard.setCell(1, 0, 'X');
+    
+    // Assert
+    expect(gameBoard.checkWinner()).toBe(null);
+  });
 });
